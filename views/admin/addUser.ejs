@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Add User</title>
+    <!-- plugins:css -->
+    <link
+      rel="stylesheet"
+      href="/vendors/iconfonts/mdi/css/materialdesignicons.min.css"
+    />
+    <link rel="stylesheet" href="/vendors/css/vendor.bundle.base.css" />
+    <link rel="stylesheet" href="/vendors/css/vendor.bundle.addons.css" />
+    <!-- endinject -->
+    <!-- plugin css for this page -->
+    <link rel="stylesheet" href="/vendors/icheck/skins/all.css" />
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- endinject -->
+    <link rel="shortcut icon" href="/images/favicon.png" />
+  </head>
+
+  <body>
+    <div class="container-scroller">
+      <nav
+        class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex flex-row"
+      >
+        <div
+          class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center"
+          style="background-color: transparent;"
+        ></div>
+      </nav>
+      <div class="container-fluid page-body-wrapper">
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+          <ul class="nav">
+            <li class="nav-item nav-profile">
+              <div class="nav-link">
+                <div class="user-wrapper">
+                  <div class="profile-image">
+                    <img src="/images/faces/face1.png" alt="profile image" />
+                  </div>
+                  <div class="text-wrapper">
+                    <p class="profile-name">Administrator</p>
+                    <div>
+                      <small class="designation text-muted"
+                        >Website Editor</small
+                      >
+                      <span class="status-indicator online"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/home">
+                <i class="menu-icon mdi mdi-television"></i>
+                <span class="menu-title">Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/users">
+                <i class="menu-icon mdi mdi-account-location"></i>
+                <span class="menu-title">Users</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/restaurants">
+                <i class="menu-icon mdi mdi-silverware-variant"></i>
+                <span class="menu-title">Restaurants</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/orders">
+                <i class="menu-icon mdi mdi-border-color"></i>
+                <span class="menu-title">Orders</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">
+                <i class="menu-icon mdi mdi-logout"></i>
+                <span class="menu-title">Log out</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="row">
+              <div class="col-md-12 d-flex align-items-stretch grid-margin">
+                <div class="row flex-grow">
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-body">
+                        <h4 class="card-title">
+                          Fill all fields to register a new user
+                        </h4>
+                        <form
+                          action="/admin/users/store"
+                          method="POST"
+                          class="forms-sample"
+                        >
+                          <div class="form-group">
+                            <label>Name:</label>
+                            <input
+                              name="name"
+                              type="text"
+                              class="form-control"
+                              placeholder="Enter name"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label>Email:</label>
+                            <input
+                              name="email"
+                              type="email"
+                              class="form-control"
+                              placeholder="Enter email"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label>Phone Number:</label>
+                            <input
+                              name="phone"
+                              type="number"
+                              class="form-control"
+                              placeholder="Phone"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label>Password</label>
+                            <input
+                              name="password"
+                              type="password"
+                              class="form-control"
+                              placeholder="Password"
+                              required
+                            />
+                          </div>
+                          <button type="submit" class="btn btn-success mr-2">
+                            Add
+                          </button>
+                          <a href="/admin/users" class="btn btn-light"
+                            >Cancel</a
+                          >
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="footer">
+            <div class="container-fluid clearfix">
+              <span
+                class="text-muted d-block text-center text-sm-left d-sm-inline-block"
+                >Copyright © 2019 Open Table Order. All rights reserved.</span
+              >
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script src="/vendors/js/vendor.bundle.base.js"></script>
+    <script src="/vendors/js/vendor.bundle.addons.js"></script>
+    <script src="/js/off-canvas.js"></script>
+    <script src="/js/misc.js"></script>
+  </body>
+</html>
