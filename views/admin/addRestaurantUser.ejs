@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Restaurant Admin Home</title>
+    <title>Add Restaurant Admin</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
@@ -36,47 +36,88 @@
         <div class="row align-items-center justify-content-center text-center">
           <div class="col-md-12">
             <h1 class="site-heading site-animate mb-3">Welcome To Open Table Order</h1>
-            <h2 class="site-subheading mb-5 site-animate">Restaurant Admin Control Panel</h2>
-            <p>Welcome, <%= user.name %></p>
+            <h2 class="site-subheading mb-5 site-animate">Admin Control Panel</h2>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="site-section bg-light" id="section-offer">
+    <section class="site-section bg-light" id="section-news">
       <div class="container">
-        
+
         <div class="row">
           <div class="col-md-12 text-center mb-5 site-animate">
-            <h2 class="display-4">Dashboard</h2>
+            <h2 class="display-4">Add Restaurant Admin</h2>
           </div>
-          <div class="col-md-12 text-center">
-            <a href="/restaurant/info/<%= restaurant_id %>">
-                <div class="d-inline-block bg-secondary custom-box">
-                    <p><i class="fas fa-info-circle custom-font"></i></p>
-                    <p style="color: white;">Info</p>
-                </div>
-            </a>
-            <a href="/restaurant/meals/<%= restaurant_id %>">
-              <div class="d-inline-block bg-secondary custom-box">
-                <p><i class="fas fa-cocktail custom-font"></i></p>
-                <p style="color: white;">Meals</p>
-              </div>
-            </a>
-            <a href="/restaurant/orders/<%= restaurant_id %>">
-            <div class="d-inline-block bg-secondary custom-box">
-                <p><i class="fas fa-cubes custom-font"></i></p>
-                <p style="color: white;">Orders</p>
-            </div>
-            </a>
-            <a href="/logout">
-              <div class="d-inline-block bg-secondary custom-box">
-                <p><i class="fas fa-sign-out-alt custom-font"></i></p>
-                <p style="color: white;">Log out</p>
-              </div>
-            </a>
+
+          <form
+          action="/admin/restaurants/users/store"
+          method="POST"
+          class="forms-sample col-12"
+        >
+          <input type="hidden" name="restaurant_id" value="<%= restaurant_id %>" required>
+          <div class="form-group">
+            <label>Name:</label>
+            <input
+              name="name"
+              type="text"
+              class="form-control"
+              placeholder="Enter name"
+              required
+            />
           </div>
-          
+          <div class="form-group">
+            <label>Email:</label>
+            <input
+              name="email"
+              type="email"
+              class="form-control"
+              placeholder="Enter email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Phone Number:</label>
+            <input
+              name="phone"
+              type="number"
+              class="form-control"
+              placeholder="Enter Phone"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Password:</label>
+            <input
+              name="password"
+              type="password"
+              class="form-control"
+              placeholder="Enter password"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Type:</label>
+            <input
+              name="type"
+              type="text"
+              class="form-control"
+              value="Restaurant_Admin"
+              readonly
+            />
+          </div>
+          <button type="submit" class="btn btn-success mr-2">
+            Add
+          </button>
+          <a href="/admin/restaurants" class="btn btn-light"
+            >Cancel</a
+          >
+        </form>
+
+          <div class="text-center" style="width: 100%">
+            <a href="/admin/home"><i class="fas fa-home" style="font-size: 30px; color: teal;"></i></a> &nbsp; <a href="/admin/restaurants/<%= restaurant_id %>"><i class="fas fa-utensils" style="font-size: 30px; color: darkgoldenrod;"></i></a>
+          </div>
+
         </div>
       </div>
     </section>

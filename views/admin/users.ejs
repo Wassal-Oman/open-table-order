@@ -53,27 +53,30 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th class="text-center">Name</th>
-                  <th class="text-center">Email</th>
-                  <th class="text-center">Phone</th>
-                  <th class="text-center">Type</th>
-                  <th class="text-center">Manage Users</th>
+                  <th class="text-center" style="color: red">Name</th>
+                  <th class="text-center" style="color: red">Email</th>
+                  <th class="text-center" style="color: red">Phone</th>
+                  <th class="text-center" style="color: red">Type</th>
+                  <th class="text-center" style="color: red">Manage Users</th>
                 </tr>
               </thead>
               <tbody>
                 <% if(typeof users != 'undefined' && users.length > 0) { %>
                   <% users.forEach(user => { %>
                     <tr>
-                      <td><%= user.name %></td>
-                      <td><%= user.email %></td>
-                      <td><%= user.phone %></td>
-                      <td><%= user.type %></td>
-                      <td><a href="/admin/users/<%= user.id %>/<%= user.type %>/delete"><i class="fas fa-times"></i></a></td>
+                      <td style="color: black;"><%= user.name %></td>
+                      <td style="color: black;"><%= user.email %></td>
+                      <td style="color: black;"><%= user.phone %></td>
+                      <td style="color: black;"><%= user.type %></td>
+                      <td style="color: black;"><a href="/admin/users/<%= user.id %>/delete" onclick="return confirm('Are you sure to delete this user?');"><i class="fas fa-times"></i></a></td>
                     </tr>
                   <% }); %>
                 <% } %>
               </tbody>
             </table>
+            <div class="text-center">
+              <a href="/admin/home"><i class="fas fa-home" style="font-size: 30px; margin-top: 50px; color: teal;"></i></a> &nbsp; <a href="/admin/users/add"><i class="fas fa-user-plus" style="font-size: 30px; margin-top: 50px; color: darkgoldenrod;"></i></a>
+            </div>
           </div>
           
         </div>

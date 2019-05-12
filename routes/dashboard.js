@@ -5,6 +5,7 @@ const firebase = require("firebase");
 const admin = require("firebase-admin");
 const { Storage } = require("@google-cloud/storage");
 const Multer = require("multer");
+const uuid = require('uuid/v1');
 const router = express.Router();
 
 // firebase configuration
@@ -91,8 +92,8 @@ router.post("/login", (req, res) => {
             req.session.user = document.data();
             if (document.data().type === "Admin") {
               res.redirect("/admin/home");
-            } else if (document.data().type === "Restaurant") {
-              res.redirect("/restaurant/home");
+            } else if (document.data().type === "Restaurant_Admin") {
+              res.redirect(`/restaurant/home/${document.data().restaurant_id}`);
             } else {
               console.log("Customer is trying to login");
               req.flash("error", "Wrong email or password");
@@ -118,7 +119,10 @@ router.post("/login", (req, res) => {
 
 // home
 router.get("/admin/home", sessionChecker, (req, res) => {
-  res.render("admin/home");
+  const user = req.session.user;
+  res.render("admin/home", {
+    user
+  });
 });
 
 // users
@@ -147,31 +151,26 @@ router.get("/admin/users", sessionChecker, (req, res) => {
 });
 
 // delete users
-router.get("/admin/users/:id/:type/delete", sessionChecker, (req, res) => {
+router.get("/admin/users/:id/delete", sessionChecker, (req, res) => {
   // get user id
   const id = req.params.id;
-  const type = req.params.type;
 
-  if (type === "Admin") {
-    res.redirect("/admin/users");
-  } else {
-    // delete user from authentication
-    let authDeletePromise = admin.auth().deleteUser(id);
-    let dbDeletePromise = db
-      .collection("users")
-      .doc(id)
-      .delete();
+  // delete user from authentication
+  let authDeletePromise = admin.auth().deleteUser(id);
+  let dbDeletePromise = db
+    .collection("users")
+    .doc(id)
+    .delete();
 
-    Promise.all([authDeletePromise, dbDeletePromise])
-      .then(() => {
-        console.log("user deleted");
-        res.redirect("/admin/users");
-      })
-      .catch(err => {
-        console.log("auth error", err);
-        res.redirect("/admin/users");
-      });
-  }
+  Promise.all([authDeletePromise, dbDeletePromise])
+    .then(() => {
+      console.log("user deleted");
+      res.redirect("/admin/users");
+    })
+    .catch(err => {
+      console.log("auth error", err);
+      res.redirect("/admin/users");
+    });
 });
 
 // add user
@@ -183,7 +182,7 @@ router.get("/admin/users/add", sessionChecker, (req, res) => {
 // store user
 router.post("/admin/users/store", sessionChecker, (req, res) => {
   // get inputs
-  const { name, email, phone, password } = req.body;
+  const { name, email, phone, password, type } = req.body;
 
   console.log(req.body);
 
@@ -205,7 +204,7 @@ router.post("/admin/users/store", sessionChecker, (req, res) => {
           name,
           email,
           phone,
-          type: "Admin"
+          type
         })
         .then(val => {
           console.log(val);
@@ -222,9 +221,78 @@ router.post("/admin/users/store", sessionChecker, (req, res) => {
     });
 });
 
+// add restaurant user
+router.get("/admin/restaurants/users/:restaurant_id/add", sessionChecker, (req, res) => {
+  const restaurant_id = req.params.restaurant_id;
+  res.render("admin/addRestaurantUser", {
+    restaurant_id
+  });
+});
+
+// store restaurant user
+router.post("/admin/restaurants/users/store", sessionChecker, (req, res) => {
+  const { name, email, phone, password, type, restaurant_id } = req.body;
+  console.log(req.body);
+
+  // create user
+  admin
+    .auth()
+    .createUser({
+      email,
+      password
+    })
+    .then(user => {
+      console.log(user);
+
+      // store in database
+      db.collection("users")
+        .doc(user.uid)
+        .set({
+          id: user.uid,
+          name,
+          email,
+          phone,
+          type,
+          restaurant_id
+        })
+        .then(val => {
+          console.log(val);
+          res.redirect(`/admin/restaurants/${restaurant_id}`);
+        })
+        .catch(err => {
+          console.log(err);
+          res.redirect("/500");
+        });
+    })
+    .catch(err => {
+      console.log(err);
+      res.redirect("/500");
+    });
+});
+
 // restaurants
 router.get("/admin/restaurants", sessionChecker, (req, res) => {
-  res.render("admin/restaurants");
+  // empty array
+  let restaurants = [];
+
+  // get data
+  db.collection("restaurants")
+    .get()
+    .then(snapshot => {
+      // load restaurants' data
+      snapshot.forEach(doc => {
+        restaurants.push(doc.data());
+      });
+
+      // render restaurants page
+      res.render("admin/restaurants", {
+        restaurants
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.redirect("/500");
+    });
 });
 
 // add restaurant
@@ -232,7 +300,7 @@ router.get("/admin/restaurants/add", sessionChecker, (req, res) => {
   res.render("admin/addRestaurant");
 });
 
-// add restaurant
+// store restaurant
 router.post(
   "/admin/restaurants/store",
   sessionChecker,
@@ -259,6 +327,7 @@ router.post(
           db.collection("restaurants")
             .doc()
             .set({
+              id: uuid(),
               name,
               location,
               email,
@@ -289,245 +358,151 @@ router.post(
   }
 );
 
-// abayas
-router.get("/abayas", sessionChecker, (req, res) => {
-  // empty array
-  let abayas = [];
+// view restaurant
+router.get("/admin/restaurants/:id", sessionChecker, (req, res) => {
+  const id = req.params.id;
+  const users = [];
 
-  // get data
-  db.collection("abayas")
-    .get()
-    .then(snapshot => {
-      // load users' data
-      snapshot.forEach(doc => {
-        abayas.push({
-          id: doc.id,
-          name: doc.data().name,
-          price: doc.data().price,
-          width: doc.data().width,
-          height: doc.data().height,
-          size: doc.data().size,
-          color: doc.data().color,
-          image: doc.data().image
-        });
-      });
+  let restaurantPromise = db.collection("restaurants").where("id", "==", id).get();
+  let usersPromise = db.collection("users").where("restaurant_id", "==", id).get();
 
-      // render users page
-      res.render("abayas", {
-        abayas
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.redirect("/500");
+  Promise.all([restaurantPromise, usersPromise]).then(val => {
+  
+    val[1].docs.forEach(user => {
+      users.push(user.data());
     });
+    res.render("admin/restaurant", {
+      restaurant: val[0].docs[0].data(),
+      users
+    });
+  });
 });
 
-// add abaya
-router.get("/abayas/add", sessionChecker, (req, res) => {
-  res.render("addAbaya");
-});
-
-// store abaya
-router.post(
-  "/abayas/store",
-  sessionChecker,
-  multer.single("file"),
-  (req, res) => {
-    // get inputs
-    const { name, type, price, width, height, color } = req.body;
-    const file = req.file;
-
-    if (file) {
-      // try uploading the file
-      uploadImageToStorage(file)
-        .then(link => {
-          // add sweet data to firestore
-          db.collection("abayas")
-            .doc()
-            .set({
-              name,
-              price,
-              width,
-              height,
-              type,
-              color,
-              image: link
-            })
-            .then(val => {
-              console.log(val);
-              res.redirect("/abayas");
-            })
-            .catch(err => {
-              console.log(err);
-              res.redirect("/abayas/add");
-            });
-        })
-        .catch(err => {
-          console.log(err);
-          res.redirect("/abayas/add");
-        });
-    } else {
-      console.log("No file has been chosen");
-      res.redirect("/abayas/add");
-    }
-  }
-);
-
-// delete abaya
-router.get("/abayas/:id/delete", sessionChecker, (req, res) => {
+// delete restaurant
+router.get("/admin/restaurants/:id/delete", sessionChecker, (req, res) => {
   // get id
   const id = req.params.id;
 
   if (id) {
-    db.collection("abayas")
+    // get image file
+    db.collection("restaurants")
       .doc(id)
-      .delete()
-      .then(val => {
-        console.log(val);
-        res.redirect("/abayas");
-      })
-      .catch(err => {
-        console.log(err);
-        res.redirect("/abayas");
-      });
-  } else {
-    console.log("Cannot get document id");
-    res.redirect("/abayas");
-  }
-});
-
-// edit abaya
-router.get("/abayas/:name/edit", sessionChecker, (req, res) => {
-  // get sweet name
-  const name = req.params.name;
-  let data = [];
-
-  if (name) {
-    // get sweet details
-    db.collection("abayas")
-      .where("name", "==", name)
       .get()
-      .then(snapshot => {
-        if (!snapshot.empty) {
-          // fetch all results
-          snapshot.forEach(doc => {
-            data.push({
-              id: doc.id,
-              name: doc.data().name,
-              type: doc.data().type,
-              price: doc.data().price,
-              color: doc.data().color,
-              width: doc.data().width,
-              height: doc.data().height
-            });
-          });
+      .then(doc => {
+        // load users' data
+        if (doc.exists) {
+          // delete image file from firebase storage
+          bucket.file(doc.data().image_name).delete((err, api) => {
+            if (err) {
+              console.log(err);
+              res.redirect("/admin/restaurants");
+            } else {
+              db.collection("restaurants")
+                .doc(id)
+                .delete()
+                .then(val => {
+                  // delete doctors associated to this center
+                  db.collection("meals")
+                    .where("restaurant_id", "==", id)
+                    .get()
+                    .then(snapshot => {
+                      if (snapshot.docs.length > 0) {
+                        // delete documents from database
+                        snapshot.forEach(doc => {
+                          db.collection("meals")
+                            .doc(doc.id)
+                            .delete();
+                        });
 
-          // render edit sweet page
-          res.render("editAbaya", {
-            abaya: data[0]
+                        console.log(val);
+                        res.redirect("/admin/restaurants");
+                      } else {
+                        console.log(val);
+                        res.redirect("/admin/restaurants");
+                      }
+                    })
+                    .catch(err => {
+                      console.log(err);
+                      res.redirect("/admin/restaurants");
+                    });
+                })
+                .catch(err => {
+                  console.log(err);
+                  res.redirect("/admin/restaurants");
+                });
+            }
           });
         } else {
-          console.log("No data available for this abaya");
-          res.redirect("/abayas");
+          res.redirect("/admin/restaurants");
         }
       })
       .catch(err => {
         console.log(err);
-        res.redirect("/abayas");
+        res.redirect("/admin/restaurants");
       });
   } else {
-    console.log("Cannot get abaya name");
-    res.redirect("/abayas");
+    console.log("Restaurant ID cannot be empty");
+    res.redirect("/admin/restaurants");
   }
 });
 
-// update abaya
-router.post(
-  "/abayas/update",
-  sessionChecker,
-  multer.single("file"),
-  (req, res) => {
-    // get sweet details
-    const { id, name, type, price, color, width, height } = req.body;
-    const file = req.file;
-
-    if (file) {
-      // try uploading the file
-      uploadImageToStorage(file)
-        .then(link => {
-          // edit sweet data in firestore
-          db.collection("abayas")
-            .doc(id)
-            .update({
-              name,
-              price,
-              color,
-              width,
-              height,
-              type,
-              image: link
-            })
-            .then(val => {
-              console.log(val);
-              res.redirect("/abayas");
-            })
-            .catch(err => {
-              console.log(err);
-              res.redirect(`/abayas/${name}/edit`);
-            });
-        })
-        .catch(err => {
-          console.log(err);
-          res.redirect(`/abayas/${name}/edit`);
-        });
-    } else {
-      // edit sweet data in firestore
-      db.collection("abayas")
-        .doc(id)
-        .update({
-          name,
-          price,
-          color,
-          width,
-          height,
-          type
-        })
-        .then(val => {
-          console.log(val);
-          res.redirect("/abayas");
-        })
-        .catch(err => {
-          console.log(err);
-          res.redirect(`/abayas/${name}/edit`);
-        });
-    }
-  }
-);
-
-// orders
-router.get("/orders", sessionChecker, (req, res) => {
+// meals
+router.get("/admin/meals", sessionChecker, (req, res) => {
   // empty array
-  let orders = [];
+  let meals = [];
 
   // get data
-  db.collection("orders")
+  db.collection("meals")
     .get()
     .then(snapshot => {
-      // load users' data
+      // load meals' data
       snapshot.forEach(doc => {
-        orders.push(doc.data());
+        meals.push(doc.data());
       });
 
-      // render users page
-      res.render("orders", {
-        orders
+      // render meals page
+      res.render("admin/meals", {
+        meals
       });
     })
     .catch(err => {
       console.log(err);
       res.redirect("/500");
     });
+});
+
+// restaurant admin home
+router.get("/restaurant/home/:restaurant_id", sessionChecker, (req, res) => {
+  const user = req.session.user;
+  const restaurant_id = req.params.restaurant_id;
+
+  res.render("restaurant/home", {
+    user,
+    restaurant_id
+  });
+});
+
+// restaurant info
+router.get("/restaurant/info/:restaurant_id", sessionChecker, (req, res) => {
+  const user = req.session.user;
+  const restaurant_id = req.params.restaurant_id;
+  const users = [];
+
+  let restaurantPromise = db.collection("restaurants").where("id", "==", restaurant_id).get();
+  let usersPromise = db.collection("users").where("restaurant_id", "==", restaurant_id).get();
+
+  Promise.all([restaurantPromise, usersPromise]).then(val => {
+  
+    val[1].docs.forEach(user => {
+      users.push(user.data());
+    });
+    res.render("restaurant/info", {
+      user,
+      users,
+      restaurant_id,
+      restaurant: val[0].docs[0].data()
+    });
+  });
 });
 
 // logout

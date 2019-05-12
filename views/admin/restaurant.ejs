@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Admin Home</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Playfair+Display:400,400i,700|Raleway"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+      integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/open-iconic-bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/animate.css" />
+    <link rel="stylesheet" href="/css/owl.carousel.min.css" />
+    <link rel="stylesheet" href="/css/owl.theme.default.min.css" />
+    <link rel="stylesheet" href="/css/magnific-popup.css" />
+    <link rel="stylesheet" href="/css/bootstrap-datepicker.css" />
+    <link rel="stylesheet" href="/css/jquery.timepicker.css" />
+    <link rel="stylesheet" href="/css/icomoon.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      .custom-box {
+        width: 150px;
+        height: 100px;
+      }
+      .custom-font {
+        font-size: 30px;
+        color: white;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body data-spy="scroll" data-target="#site-navbar" data-offset="200">
+    <section
+      class="site-cover"
+      style="background-image: url(/images/bg_3.jpg); padding-top: 100px;"
+      id="section-home"
+    >
+      <div class="container">
+        <div class="row align-items-center justify-content-center text-center">
+          <div class="col-md-12">
+            <h1 class="site-heading site-animate mb-3">
+              Welcome To Open Table Order
+            </h1>
+            <h2 class="site-subheading mb-5 site-animate">
+              Admin Control Panel
+            </h2>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-section" id="section-about">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-5 site-animate mb-5">
+            <h2 class="site-primary-title display-4"><%= restaurant.name %></h2>
+            <p>
+              Location: <span style="color: black"><%= restaurant.location %></span>
+            </p>
+
+            <p class="mb-4">
+              Phone Number: <span style="color: black"><%= restaurant.phone %></span>
+            </p>
+            <p>
+              Email: <span style="color: black"><%= restaurant.email %></span>
+            </p>
+            <p>
+              Website: <a href="<%= restaurant.website %>"><%= restaurant.website %></a>
+            </p>
+          </div>
+          <div class="col-md-1"></div>
+          <div
+            class="col-md-6 site-animate img"
+            data-animate-effect="fadeInRight"
+          >
+            <img
+              src="<%= restaurant.image %>"
+              alt="Free Template by colorlib.com"
+              class="img-fluid"
+              style="float: right;"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div id="map" style="width:100%; height:400px;"></div>
+        </div>
+        <div class="row text-center" style="margin-top: 50px;">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center" style="color: red">Name</th>
+                <th class="text-center" style="color: red">Email</th>
+                <th class="text-center" style="color: red">Phone</th>
+                <th class="text-center" style="color: red">Type</th>
+                <th class="text-center" style="color: red">Manage Users</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if(typeof users != 'undefined' && users.length > 0) { %>
+                <% users.forEach(user => { %>
+                  <tr>
+                    <td style="color: black;"><%= user.name %></td>
+                    <td style="color: black;"><%= user.email %></td>
+                    <td style="color: black;"><%= user.phone %></td>
+                    <td style="color: black;"><%= user.type %></td>
+                    <td style="color: black;"><a href="/admin/users/<%= user.id %>/delete" onclick="return confirm('Are you sure to delete this user?');"><i class="fas fa-times"></i></a></td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <td colspan="5">No Users Registered for this Restaurant</td>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <div class="text-center" style="width: 100%; margin-top: 50px;">
+          <a href="/admin/home"><i class="fas fa-home" style="font-size: 30px; color: teal;"></i></a> &nbsp <a href="/admin/restaurants"><i class="fas fa-utensils" style="font-size: 30px; color: darkgoldenrod;"></i></a> &nbsp <a href="/admin/restaurants/<%= restaurant.document_id %>/delete" onclick="return confirm('Are you sure to delete this restaurant?');"><i class="fas fa-times" style="font-size: 30px; color: red;"></i></a> &nbsp; <a href="/admin/restaurants/users/<%= restaurant.id %>/add"><i class="fas fa-user-plus" style="font-size: 30px; color: green;"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer site-bg-dark site-section">
+      <div class="container">
+        <div class="row site-animate">
+          <div class="col-md-12 text-center">
+            <p>
+              &copy; Copyright - Open Table Order -
+              <script>document.write(new Date().getFullYear());</script>, All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JS Files -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/bootstrap-datepicker.js"></script>
+    <script src="/js/jquery.timepicker.min.js"></script>
+    <script src="/js/jquery.animateNumber.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        // Initialize and add the map
+        function initMap() {
+            // map settings
+            let mapProp = {
+                center: new google.maps.LatLng(
+                    "<%= restaurant.latitude %>",
+                    "<%= restaurant.logitude %>"
+                ),
+                zoom: 7
+            };
+            let map = new google.maps.Map(document.getElementById("map"), mapProp);
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng (
+                    "<%= restaurant.latitude %>",
+                    "<%= restaurant.logitude %>"
+                ),
+                map: map,
+                title: "<%= restaurant.name %>"
+            });
+        }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdYgE5n80X3YzZCAWIzzWOwcj-ooDfSFk&callback=initMap"></script>
+  </body>
+</html>
